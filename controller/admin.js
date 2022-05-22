@@ -2,6 +2,7 @@ const {
   hash,
   hashMatch,
   loginBodyValidation,
+  createLoginValidation,
 } = require("../tools/authentication");
 const { ValidationError } = require("../tools/error");
 const { error, success } = require("../tools/response");
@@ -16,7 +17,7 @@ const login = async (req, res) => {
     // query db is user exists by email
     const user = await User.findOne({ email: req.body.email });
     console.log(user);
-    res.status(200).send(success(`Credentials accepted`,{}));
+    res.status(200).send(success(`Credentials accepted`, {}));
   } catch (e) {
     switch (e) {
       case e instanceof ValidationError:
@@ -27,11 +28,25 @@ const login = async (req, res) => {
         break;
     }
   }
-  return "login";
 };
-const logout = (req, res) => {
-  return "logout";
+const createAdmin = async (req, res) => {
+  try {
+    console.log(req.body);
+    const result = createLoginValidation(req.body);
+    console.log(result);
+    res.status(200).send(success(`Admin '${'test name'}' created`, {}));
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
 };
+const logout = (req, res) => {};
 
 // Handle Episode
 const getEpisode = async (req, res) => {
@@ -79,6 +94,7 @@ const deleteVote = async (req, res) => {
 module.exports = {
   login,
   logout,
+  createAdmin,
   getEpisode,
   addEpisode,
   editEpisode,

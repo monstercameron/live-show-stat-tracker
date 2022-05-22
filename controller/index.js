@@ -9,6 +9,8 @@ const Test = require("./test.js");
 // Handle Admin Tasks
 // handle token generation
 router.post("/admin/login", Admin.login);
+// create new admin account
+router.post("/admin/newadmin", Admin.createAdmin);
 // handle Episodes
 router.get("/admin", Admin.getEpisode);
 router.post("/admin", Admin.addEpisode);

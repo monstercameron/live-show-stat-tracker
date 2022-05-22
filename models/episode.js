@@ -1,6 +1,8 @@
-const {mongoose} = require("../tools/database");
+const {
+  mongoose: { Schema, model },
+} = require("../tools/database");
 
-const episode = new mongoose.Schema({
+const episode = new Schema({
   title: String,
   date: Date,
   link: String,
@@ -8,5 +10,4 @@ const episode = new mongoose.Schema({
   topics: [String],
 });
 
-const Episode = mongoose.model("Episode", episode);
-module.exports = Episode;
+module.exports = { Episode: model("Episode", episode) };

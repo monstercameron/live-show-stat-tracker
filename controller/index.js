@@ -7,6 +7,8 @@ const Admin = require("./admin.js");
 const Test = require("./test.js");
 
 // Handle Admin Tasks
+// handle token generation
+router.post("/admin/login", Admin.login);
 // handle Episodes
 router.get("/admin", Admin.getEpisode);
 router.post("/admin", Admin.addEpisode);

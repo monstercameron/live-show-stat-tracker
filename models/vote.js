@@ -1,6 +1,8 @@
-const { mongoose } = require("../tools/database");
+const {
+  mongoose: { Schema, model },
+} = require("../tools/database");
 
-const vote = new mongoose.Schema({
+const vote = new Schema({
   targetId: ObjectId,
   sexualAttraction: Number,
   relationshipAttraction: Number,
@@ -8,5 +10,4 @@ const vote = new mongoose.Schema({
   personality: Number,
 });
 
-const Vote = mongoose.model("Vote", vote);
-module.exports = Vote;
+module.exports = { Vote: model("Vote", vote) };

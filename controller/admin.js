@@ -1,5 +1,32 @@
+const {
+  hash,
+  hashMatch,
+  loginBodyValidation,
+} = require("../tools/authentication");
+const { ValidationError } = require("../tools/error");
+const { error, success } = require("../tools/response");
+const { User } = require("../models/user");
+
 // Handle Auth
-const login = (req, res) => {
+const login = async (req, res) => {
+  try {
+    // validate if params exists
+    loginBodyValidation(req.body);
+    // validate login params are in spec
+    // query db is user exists by email
+    const user = await User.findOne({ email: req.body.email });
+    console.log(user);
+    res.status(200).send(success(`Credentials accepted`,{}));
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
   return "login";
 };
 const logout = (req, res) => {
@@ -51,6 +78,7 @@ const deleteVote = async (req, res) => {
 // Export functions
 module.exports = {
   login,
+  logout,
   getEpisode,
   addEpisode,
   editEpisode,

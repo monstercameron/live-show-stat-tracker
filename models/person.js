@@ -1,4 +1,6 @@
-const {mongoose} = require("../tools/database");
+const {
+  mongoose: { Schema, model },
+} = require("../tools/database");
 
 const education = [
   "some highschool",
@@ -19,7 +21,7 @@ const relationshipStatus = [
   "Polygamy/gyny",
 ];
 
-const person = new mongoose.Schema({
+const person = new Schema({
   name: String,
   age: Number,
   occupation: String,
@@ -29,5 +31,8 @@ const person = new mongoose.Schema({
   ralationshipStatus: String,
 });
 
-const Person = mongoose.model("Person", person);
-module.exports = Person;
+module.exports = {
+  Person: model("Person", person),
+  education,
+  relationshipStatus,
+};

@@ -1,5 +1,6 @@
 const Person = require("../models/person");
 const Episode = require("../models/episode");
+const { User } = require("../models/user");
 
 const test = async (req, res) => {
   try {
@@ -13,9 +14,10 @@ const test = async (req, res) => {
 
 const test2 = async (req, res) => {
     try {
-      const person = new Person({ name: "john dowe" });
-      const result = await person.save();
-      res.send(`Title:'${person.name}', ID:'${result._id}'`);
+      const user = new User({ email: "john dowe" });
+      // const person = new Person({ name: "john dowe" });
+      const result = await user.save();
+      res.send(`Title:'${result.name}', ID:'${result._id}'`);
     } catch (error) {
       res.send(error);
     }

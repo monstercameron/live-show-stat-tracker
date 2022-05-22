@@ -5,8 +5,9 @@ const { User } = require("../models/user");
 const test = async (req, res) => {
   try {
     const episode = new Episode({ title: "kill to party 2" });
-    const result = await episode.save();
-    res.send(`Title:'${episode.title}', ID:'${result._id}'`);
+    // const result = await episode.save();
+    // res.send(`Title:'${episode.title}', ID:'${result._id}'`);
+    res.send(episode);
   } catch (error) {
     res.send(error);
   }

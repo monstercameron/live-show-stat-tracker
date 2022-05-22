@@ -9,10 +9,10 @@ const {
   createLoginValidation,
   createEpisodeValidation,
 } = require("../tools/validation");
-const { ValidationError } = require("../tools/error");
-const { error, success } = require("../tools/response");
 const { User } = require("../models/user");
 const { Episode } = require("../models/episode");
+const { ValidationError } = require("../tools/error");
+const { error, success } = require("../tools/response");
 
 // Handle token creation
 const login = async (req, res) => {
@@ -205,12 +205,64 @@ const addEpisode = async (req, res) => {
 
 // edit episode
 const editEpisode = async (req, res) => {
-  res.send("addEpisode");
+  try {
+    // validate params
+    createEpisodeValidation(req.body);
+
+    // check if episode exists
+    const previousEpisode = await Episode.findOne({
+      episode: req.body.episode,
+    });
+    if (previousEpisode === null)
+      throw new ValidationError("Episode not found");
+
+    // edit episode
+    const editedEpisode = await Episode.findOneAndUpdate(
+      { episode: req.body.episode },
+      req.body,
+      { new: true }
+    );
+
+    // send response
+    res.status(200).send(success(`Episode edited`, { results: editedEpisode }));
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
 };
 
 // delete episode
 const deleteEpisode = async (req, res) => {
-  res.send("addEpisode");
+  try {
+    // check if episode exists
+    const previousEpisode = await Episode.findOne({
+      episode: req.query.episode,
+    });
+    if (previousEpisode === null)
+      throw new ValidationError("Episode not found");
+
+    // delete episode
+    await Episode.findOneAndDelete({ episode: req.query.episode });
+
+    // send response
+    res.status(200).send(success(`Episode deleted`, {}));
+  } catch (e) {
+    
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
 };
 
 // Handle Person

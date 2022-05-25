@@ -69,8 +69,53 @@ const createEpisodeValidation = ({ series, title, episode, date, link }) => {
   return true;
 };
 
+// validate vote body
+const createVoteValidation = ({
+  looks,
+  targetId,
+  indentifier,
+  personality,
+  sexualAttraction,
+  relationshipAttraction,
+}) => {
+  if (!targetId) throw new ValidationError("No 'Target ID' was given");
+  if (!sexualAttraction)
+    throw new ValidationError("No 'Sexual Attraction' was given");
+  if (!relationshipAttraction)
+    throw new ValidationError("No 'Relationship Attraction' was given");
+  if (!looks) throw new ValidationError("No 'Looks' was given");
+  if (!personality) throw new ValidationError("No 'Personality' was given");
+  if (sexualAttraction < 0)
+    throw new ValidationError("Sexual Attraction cannot be negative");
+  if (sexualAttraction > 10)
+    throw new ValidationError("Sexual Attraction cannot be greater than 10");
+  if (relationshipAttraction < 0)
+    throw new ValidationError("Relationship Attraction cannot be negative");
+  if (relationshipAttraction > 10)
+    throw new ValidationError(
+      "Relationship Attraction cannot be greater than 10"
+    );
+  if (looks < 0) throw new ValidationError("Looks cannot be negative");
+  if (looks > 10) throw new ValidationError("Looks cannot be greater than 10");
+  if (personality < 0)
+    throw new ValidationError("Personality cannot be negative");
+  if (personality > 10)
+    throw new ValidationError("Personality cannot be greater than 10");
+  if (typeof looks !== "number")
+    throw new ValidationError("Target ID is not a number");
+  if (typeof personality !== "number")
+    throw new ValidationError("Target ID is not a number");
+  if (typeof sexualAttraction !== "number")
+    throw new ValidationError("Target ID is not a number");
+  if (typeof relationshipAttraction !== "number")
+    throw new ValidationError("Target ID is not a number");
+
+  return true;
+};
+
 module.exports = {
   loginBodyValidation,
+  createVoteValidation,
   createLoginValidation,
   createEpisodeValidation,
 };

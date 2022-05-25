@@ -3,11 +3,12 @@ const {
 } = require("../tools/database");
 
 const vote = new Schema({
-  targetId: ObjectId,
+  looks: Number,
+  targetId: String,
+  personality: Number,
+  indentifier: String,
   sexualAttraction: Number,
   relationshipAttraction: Number,
-  looks: Number,
-  personality: Number,
 });
 
 module.exports = { Vote: model("Vote", vote) };

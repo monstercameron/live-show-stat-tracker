@@ -6,10 +6,14 @@ const {
 } = require("../tools/authentication");
 const {
   loginBodyValidation,
+  createVoteValidation,
   createLoginValidation,
   createEpisodeValidation,
 } = require("../tools/validation");
+const { ObjectId } = require("mongodb");
 const { User } = require("../models/user");
+const { Vote } = require("../models/vote");
+const { Person } = require("../models/person");
 const { Episode } = require("../models/episode");
 const { ValidationError } = require("../tools/error");
 const { error, success } = require("../tools/response");
@@ -253,7 +257,6 @@ const deleteEpisode = async (req, res) => {
     // send response
     res.status(200).send(success(`Episode deleted`, {}));
   } catch (e) {
-    
     switch (e) {
       case e instanceof ValidationError:
         res.status(400).send(error(e.message));
@@ -265,32 +268,204 @@ const deleteEpisode = async (req, res) => {
   }
 };
 
-// Handle Person
+// Get all person
 const getPerson = async (req, res) => {
-  res.send("addEpisode");
-};
-const addPerson = async (req, res) => {
-  res.send("addEpisode");
-};
-const editPerson = async (req, res) => {
-  res.send("addEpisode");
-};
-const deletePerson = async (req, res) => {
-  res.send("addEpisode");
+  try {
+    if (req.query.id) {
+      const person = await Person.findOne({ _id: req.query.id });
+      if (person === null) throw new ValidationError("Person not found");
+      res.status(200).send(success(`Person found`, { results: person }));
+    } else {
+      const results = await Person.find({});
+      res.status(200).send(success(`Persons found`, { results }));
+    }
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
 };
 
-// Handle Vote
+// edit person TODO
+const addPerson = async (req, res) => {
+  try {
+    if (req.query.id) {
+      const person = await Person.findOne({ _id: req.query.id });
+      if (person === null) throw new ValidationError("Person not found");
+      // await Person.findOneAndDelete({ _id: req.query.id });
+      res
+        .status(200)
+        .send(
+          success(
+            `-Not implemented- Person removed by ID:'${req.query.id}'`,
+            {}
+          )
+        );
+    } else {
+      throw new ValidationError("Please provide a person id");
+    }
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
+};
+
+// edit person TODO
+const editPerson = async (req, res) => {
+  try {
+    if (req.query.id) {
+      const person = await Person.findOne({ _id: req.query.id });
+      if (person === null) throw new ValidationError("Person not found");
+      // await Person.findOneAndDelete({ _id: req.query.id });
+      res
+        .status(200)
+        .send(
+          success(
+            `-Not implemented- Person removed by ID:'${req.query.id}'`,
+            {}
+          )
+        );
+    } else {
+      throw new ValidationError("Please provide a person id");
+    }
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
+};
+
+// delete person
+const deletePerson = async (req, res) => {
+  try {
+    if (req.query.id) {
+      const person = await Person.findOne({ _id: req.query.id });
+      if (person === null) throw new ValidationError("Person not found");
+      await Person.findOneAndDelete({ _id: req.query.id });
+      res
+        .status(200)
+        .send(success(`Person removed by ID:'${req.query.id}'`, {}));
+    } else {
+      throw new ValidationError("Please provide a person id");
+    }
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
+};
+
+// Get votes
 const getVote = async (req, res) => {
-  res.send("addVote");
+  try {
+    if (req.query.id) {
+      const vote = await Vote.find({ targetId: req.query.id });
+      if (vote.length === 0)
+        throw new ValidationError(`votes not found for ID:'${req.query.id}'`);
+      res.status(200).send(success(`vote(s) found`, { results: vote }));
+    } else {
+      throw new ValidationError("Please provide a target id for votes");
+    }
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
 };
+
+// add vote or overwrite vote
 const addVote = async (req, res) => {
-  res.send("addVote");
+  try {
+    // validate vote params
+    createVoteValidation(req.body);
+
+    // check if person exists
+    const previousPerson = await Person.findOne({ _id: req.body.targetId });
+    if (previousPerson === null) throw new ValidationError("Person not found");
+
+    const identifier = `${req.ip + req.get("User-Agent")}`;
+    const identifierHash = await hash(identifier);
+
+    // check if vote exists
+    const previousVote = await Vote.findOne({
+      identifierHash,
+      targetId: req.body.targetId,
+    });
+    if (previousVote === null) {
+      // create new vote
+      const newVote = new Vote({ indentifier: identifierHash, ...req.body });
+      await newVote.save();
+      res.send(success(`Vote added for Identifier:'${identifierHash}'`, {}));
+    } else {
+      // overwrite vote
+      console.log("overwrite vote");
+      await Vote.findOneAndUpdate({ identifierHash }, req.body, { new: true });
+      res.send(
+        success(
+          `Vote overwritten for target:'${req.body.targetId}' by Identifier:'${identifierHash}'`,
+          {}
+        )
+      );
+    }
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
 };
-const editVote = async (req, res) => {
-  res.send("addVote");
-};
+
+// delete vote
 const deleteVote = async (req, res) => {
-  res.send("addVote");
+  try {
+    if (req.query.id) {
+      const vote = await Vote.findOne({ _id: req.query.id });
+      if (vote === null) throw new ValidationError("Vote not found");
+      await Vote.findOneAndDelete({ _id: req.query.id });
+      res.status(200).send(success(`Vote removed by ID:'${req.query.id}'`, {}));
+    } else {
+      throw new ValidationError("Please provide a vote id");
+    }
+  } catch (e) {
+    switch (e) {
+      case e instanceof ValidationError:
+        res.status(400).send(error(e.message));
+        break;
+      default:
+        res.status(500).send(error(e.message));
+        break;
+    }
+  }
 };
 
 // Export functions
@@ -304,11 +479,9 @@ module.exports = {
   editEpisode,
   deleteEpisode,
   getPerson,
-  addPerson,
   editPerson,
   deletePerson,
   getVote,
   addVote,
-  editVote,
   deleteVote,
 };

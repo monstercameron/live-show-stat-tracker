@@ -25,7 +25,7 @@ router.post("/admin/episode", authenticate, Admin.addEpisode);
 router.put("/admin/episode", authenticate, Admin.editEpisode);
 router.delete("/admin/episode", authenticate, Admin.deleteEpisode);
 // handle Persons
-router.get("/admin/person", authenticate, Admin.getPerson);
+router.get("/admin/person", Admin.getPerson);
 router.post("/admin/person", authenticate, Admin.addPerson);
 router.put("/admin/person", authenticate, Admin.editPerson);
 router.delete("/admin/person", authenticate, Admin.deletePerson);

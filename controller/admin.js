@@ -8,8 +8,8 @@ const {
   loginBodyValidation,
   createVoteValidation,
   createLoginValidation,
-  createEpisodeValidation,
   createPersonValidation,
+  createEpisodeValidation,
 } = require("../tools/validation");
 const { ObjectId } = require("mongodb");
 const { User } = require("../models/user");

@@ -292,15 +292,15 @@ const getPerson = async (req, res) => {
   }
 };
 
-// edit person 
+// edit person
 // TODO: complete field validator
 const addPerson = async (req, res) => {
   try {
     createPersonValidation(req.body);
     const person = await Person.findOne({ name: req.body.name });
     if (person !== null) throw new ValidationError("Person Already Exists");
-    const newPerson = new Person(req.body)
-    newPerson.save()
+    const newPerson = new Person(req.body);
+    newPerson.save();
     res.status(201).send(success(`New Person '${newPerson.name}' saved`, {}));
   } catch (e) {
     switch (e) {
@@ -317,21 +317,19 @@ const addPerson = async (req, res) => {
 // edit person
 const editPerson = async (req, res) => {
   try {
-      const person = await Person.findOne({ _id: req.query.id });
-      if (person === null) throw new ValidationError("Person not found");
-      console.log(req.body);
-      await Person.findOneAndUpdate({...req.body});
-      res
-        .status(200)
-        .send(
-          success(
-            `Person updated {${Object.keys(req.body).map((itm)=>{
-              return `Field:${itm} --> new:${req.body[itm]} --> old:${person[itm]}`
-            }).join(', ')}}`,
-            {}
-          )
-        );
-    
+    const person = await Person.findOne({ _id: req.query.id });
+    if (person === null) throw new ValidationError("Person not found");
+    await Person.findOneAndUpdate({ ...req.body });
+    res.status(200).send(
+      success(
+        `Person updated {${Object.keys(req.body)
+          .map((itm) => {
+            return `Field:${itm} --> new:${req.body[itm]} --> old:${person[itm]}`;
+          })
+          .join(", ")}}`,
+        {}
+      )
+    );
   } catch (e) {
     switch (e) {
       case e instanceof ValidationError:

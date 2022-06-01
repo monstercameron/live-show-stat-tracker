@@ -9,6 +9,7 @@ const {
   createVoteValidation,
   createLoginValidation,
   createEpisodeValidation,
+  createPersonValidation,
 } = require("../tools/validation");
 const { ObjectId } = require("mongodb");
 const { User } = require("../models/user");
@@ -291,24 +292,16 @@ const getPerson = async (req, res) => {
   }
 };
 
-// edit person TODO
+// edit person 
+// TODO: complete field validator
 const addPerson = async (req, res) => {
   try {
-    if (req.query.id) {
-      const person = await Person.findOne({ _id: req.query.id });
-      if (person === null) throw new ValidationError("Person not found");
-      // await Person.findOneAndDelete({ _id: req.query.id });
-      res
-        .status(200)
-        .send(
-          success(
-            `-Not implemented- Person removed by ID:'${req.query.id}'`,
-            {}
-          )
-        );
-    } else {
-      throw new ValidationError("Please provide a person id");
-    }
+    createPersonValidation(req.body);
+    const person = await Person.findOne({ name: req.body.name });
+    if (person !== null) throw new ValidationError("Person Already Exists");
+    const newPerson = new Person(req.body)
+    newPerson.save()
+    res.status(201).send(success(`New Person '${newPerson.name}' saved`, {}));
   } catch (e) {
     switch (e) {
       case e instanceof ValidationError:
@@ -321,24 +314,24 @@ const addPerson = async (req, res) => {
   }
 };
 
-// edit person TODO
+// edit person
 const editPerson = async (req, res) => {
   try {
-    if (req.query.id) {
       const person = await Person.findOne({ _id: req.query.id });
       if (person === null) throw new ValidationError("Person not found");
-      // await Person.findOneAndDelete({ _id: req.query.id });
+      console.log(req.body);
+      await Person.findOneAndUpdate({...req.body});
       res
         .status(200)
         .send(
           success(
-            `-Not implemented- Person removed by ID:'${req.query.id}'`,
+            `Person updated {${Object.keys(req.body).map((itm)=>{
+              return `Field:${itm} --> new:${req.body[itm]} --> old:${person[itm]}`
+            }).join(', ')}}`,
             {}
           )
         );
-    } else {
-      throw new ValidationError("Please provide a person id");
-    }
+    
   } catch (e) {
     switch (e) {
       case e instanceof ValidationError:
@@ -479,6 +472,7 @@ module.exports = {
   editEpisode,
   deleteEpisode,
   getPerson,
+  addPerson,
   editPerson,
   deletePerson,
   getVote,

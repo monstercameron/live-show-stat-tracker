@@ -113,9 +113,25 @@ const createVoteValidation = ({
   return true;
 };
 
+// validate person body
+const createPersonValidation = ({
+  name,
+  age,
+  occupation,
+  education,
+  socialMedia,
+  bodyCount,
+  relationshipStatus,
+}) => {
+  // Implement when I have github copilot
+  console.log(`no validations performed`);
+  return true;
+};
+
 module.exports = {
   loginBodyValidation,
   createVoteValidation,
   createLoginValidation,
   createEpisodeValidation,
+  createPersonValidation,
 };

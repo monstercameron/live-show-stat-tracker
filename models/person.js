@@ -28,7 +28,7 @@ const person = new Schema({
   education: String,
   socialMedia: String,
   bodyCount: Number,
-  ralationshipStatus: String,
+  relationshipStatus: String,
 });
 
 module.exports = {
